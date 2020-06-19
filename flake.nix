@@ -9,10 +9,6 @@
 
   outputs = { self, nixpkgs, tbsync-src, ... }@inputs:
     let
-
-      # Generate a user-friendly version numer.
-      version = builtins.substring 0 8 hello-src.lastModifiedDate;
-
       # System types to support.
       supportedSystems = [ "x86_64-linux" ];
 
@@ -27,32 +23,31 @@
     {
 
       # A Nixpkgs overlay.
-      overlay = final: prev: {
+      overlay = final: prev: with final.pkgs; {
 
-        hello = with final; stdenv.mkDerivation rec {
-          name = "hello-${version}";
-
-          src = hello-src;
-
-          buildInputs = [ autoconf automake gettext gnulib perl gperf texinfo help2man ];
-
-          preConfigure = ''
-            mkdir -p .git # force BUILD_FROM_GIT
-            ./bootstrap --gnulib-srcdir=${gnulib-src} --no-git --skip-po
-          '';
-
-          meta = {
-            homepage = "https://www.gnu.org/software/hello/";
-            description = "A program to show a familiar, friendly greeting";
+        thunderbird-extensions = recurseIntoAttrs (callPackage ./pkgs/thunderbird-extensions {
+          overrides = {
+            # not really ideal but passes the values to the derivation
+            tbsync = callPackage ./pkgs/thunderbird-extensions/tbsync { } {
+              # Generate a user-friendly version numer.
+              version = builtins.substring 0 8 tbsync-src.lastModifiedDate;
+              src = tbsync-src;
+            };
           };
-        };
+        });
 
       };
 
       # Provide some binary packages for selected system types.
       packages = forAllSystems (system:
+        let
+          pkgSet = nixpkgsFor.${system};
+        in
         {
-          inherit (nixpkgsFor.${system}) hello;
+
+          inherit (pkgSet.thunderbird-extensions)
+            tbsync;
+
         });
 
       # The default package for 'nix build'. This makes sense if the
@@ -73,7 +68,8 @@
 
       # Tests run by 'nix flake check' and by Hydra.
       checks = forAllSystems (system: {
-        inherit (self.packages.${system}) hello;
+        inherit (self.packages.${system}.thunderbird-extensions)
+          tbsync;
 
         # Additional tests, if applicable.
         test =
