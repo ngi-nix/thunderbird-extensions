@@ -1,5 +1,5 @@
 {
-  description = "(insert short project description here)";
+  description = "Flake for a Thunderbird with extensions";
 
   # Nixpkgs / NixOS version to use.
   inputs.nixpkgs.url = "nixpkgs/nixos-20.03";
