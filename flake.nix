@@ -59,6 +59,7 @@
             thunderbirdExtensions = with pkgSet.thunderbird-extensions; [
               tbsync
               dav-4-tbsync
+              eas-4-tbsync
             ];
           };
 
