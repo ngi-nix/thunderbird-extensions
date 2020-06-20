@@ -38,15 +38,13 @@ jobs:
         fetch-depth: 0
     - uses: cachix/install-nix-action@v10
       with:
-        install_url: https://hydra.nixos.org/job/nix/flakes/installerScript/latest/download-by-type/file/installer
+        nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/master.tar.gz
         skip_adding_nixpkgs_channel: true
     - name: Nix config
       run: |
-        mkdir -p ~/.config/nix
-        echo "experimental-features = flakes nix-command" >> ~/.config/nix/nix.conf
-        sed -i "s@inputs\..*@@g" flake.nix
-        nix registry add nixpkgs github:NixOS/nixpkgs/${{ matrix.nixpkgs }}
-        sed -i 's/ref = "master"/ref = "${{ matrix.tbsync }}"/' flake.nix
+        sed -i 's/\(repo = "nixpkgs"; ref = \)"nixos-20.03"/\1"${{ matrix.nixpkgs }}"/' flake.nix
+        sed -i 's/\(repo = "TbSync"; ref = \)"master"/\1"${{ matrix.tbsync }}"/' flake.nix
     - name: Nix build
       run: |
-        nix build -L --recreate-lock-file .#packages.x86_64-linux.${{ matrix.package }}
+        nix-shell -p nixFlakes --run 'nix --experimental-features "flakes nix-command" build \
+          --print-build-logs --recreate-lock-file .#packages.x86_64-linux.${{ matrix.package }}'
