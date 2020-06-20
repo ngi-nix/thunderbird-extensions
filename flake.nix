@@ -58,6 +58,7 @@
           sample-thunderbird = pkgSet.thunderbird-with-extensions.override {
             thunderbirdExtensions = with pkgSet.thunderbird-extensions; [
               tbsync
+              dav-4-tbsync
             ];
           };
 

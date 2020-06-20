@@ -1,3 +1,5 @@
 { callPackage, overrides ? {}, ... }:
 
-{ } // overrides
+{
+  dav-4-tbsync = callPackage ./tbsync/dav-4.nix { };
+} // overrides
