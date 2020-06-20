@@ -80,10 +80,8 @@
       # Tests run by 'nix flake check' and by Hydra.
       checks = forAllSystems (system: {
         inherit (self.packages.${system})
-          thunderbird thunderbird-with-extensions;
-
-        inherit (self.packages.${system}.thunderbird-extensions)
-          tbsync;
+          thunderbird thunderbird-with-extensions tbsync
+          sample-thunderbird;
 
         # Additional tests, if applicable.
         test =
