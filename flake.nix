@@ -69,14 +69,15 @@
       defaultPackage = forAllSystems (system: self.packages.${system}.thunderbird-with-extensions);
 
       # A NixOS module, if applicable (e.g. if the package provides a system service).
-      nixosModules.hello =
+      nixosModules.thunderbird =
         { pkgs, ... }:
         {
+          imports =
+            [
+              ./modules/thunderbird.nix
+            ];
+
           nixpkgs.overlays = [ self.overlay ];
-
-          environment.systemPackages = [ pkgs.hello ];
-
-          #systemd.services = { ... };
         };
 
       # Tests run by 'nix flake check' and by Hydra.
@@ -128,7 +129,11 @@
           makeTest {
             nodes = {
               machine = { ... }: {
-                environment.systemPackages = [ sample-thunderbird ];
+                imports = [ self.nixosModules.thunderbird ];
+                services.thunderbird = {
+                  enable = true;
+                  extensions = [ tbsync ];
+                };
               };
             };
 
