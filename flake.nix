@@ -28,6 +28,8 @@
       # A Nixpkgs overlay.
       overlay = final: prev: with final.pkgs; {
 
+        thunderbird-utils = recurseIntoAttrs (callPackage ./pkgs/thunderbird-extensions/thunderbird-utils.nix { });
+
         thunderbird-with-extensions = callPackage ./pkgs/thunderbird/with-extensions.nix { };
 
         thunderbird-extensions = recurseIntoAttrs (callPackage ./pkgs/thunderbird-extensions {

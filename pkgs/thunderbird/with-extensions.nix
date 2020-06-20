@@ -9,7 +9,7 @@ let
 
   extensionPolicy = writeText "policies.json" (builtins.toJSON {
     # The only actual setting from Extensions we care about
-    policies.Extensions.Install = map (ext: "/${ext}/${ext.EXTENSION_DIR}/${ext.EMID}.xpi") thunderbirdExtensions;
+    policies.Extensions.Install = map (ext: "/${ext}/${ext.extensionDir}/${ext.emid}.xpi") thunderbirdExtensions;
   });
 
   defaultPolicy = if builtins.pathExists "${thunderbird}/${distributionDir}/${policyFilename}"
