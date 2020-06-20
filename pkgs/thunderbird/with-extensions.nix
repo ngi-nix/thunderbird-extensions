@@ -8,8 +8,12 @@ let
   policyFilename = "policies.json";
 
   extensionPolicy = writeText "policies.json" (builtins.toJSON {
-    # The only actual setting from Extensions we care about
-    policies.Extensions.Install = map (ext: "/${ext}/${ext.extensionDir}/${ext.emid}.xpi") thunderbirdExtensions;
+    policies = {
+      # Disable updates because it's managed through Nix so it won't work anyway
+      DisableAppUpdate = true;
+      # The only actual setting from Extensions we care about
+      Extensions.Install = map (ext: "/${ext}/${ext.extensionDir}/${ext.emid}.xpi") thunderbirdExtensions;
+    };
   });
 
   defaultPolicy = if builtins.pathExists "${thunderbird}/${distributionDir}/${policyFilename}"
