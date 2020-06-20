@@ -55,10 +55,13 @@
             thunderbird thunderbird-with-extensions;
 
           inherit (pkgSet.thunderbird-extensions)
-            tbsync;
+            enigmail
+            tbsync dav-4-tbsync eas-4-tbsync;
 
           sample-thunderbird = pkgSet.thunderbird-with-extensions.override {
             thunderbirdExtensions = with pkgSet.thunderbird-extensions; [
+              enigmail
+
               tbsync
               dav-4-tbsync
               eas-4-tbsync
@@ -87,7 +90,8 @@
       # Tests run by 'nix flake check' and by Hydra.
       checks = forAllSystems (system: {
         inherit (self.packages.${system})
-          thunderbird thunderbird-with-extensions tbsync
+          thunderbird thunderbird-with-extensions
+          enigmail tbsync dav-4-tbsync eas-4-tbsync
           sample-thunderbird;
 
         # Additional tests, if applicable.

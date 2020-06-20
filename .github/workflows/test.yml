@@ -22,7 +22,10 @@ jobs:
         package:
           - thunderbird
           - thunderbird-with-extensions
+          - enigmail
           - tbsync
+          - dav-4-tbsync
+          - eas-4-tbsync
           - sample-thunderbird
 
     steps:
