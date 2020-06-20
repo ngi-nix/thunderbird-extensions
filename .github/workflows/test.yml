@@ -1,0 +1,52 @@
+name: thunderbird-extensions
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 * * * *'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 720
+    strategy:
+      fail-fast: false
+      matrix:
+        nixpkgs:
+          - nixos-20.03
+          - master
+        tbsync:
+          - v2.11
+          - master
+        package:
+          - thunderbird
+          - thunderbird-with-extensions
+          - tbsync
+          - sample-thunderbird
+
+    steps:
+    - name: Obtain maximum storage
+      run: |
+        sudo swapoff -a
+        sudo rm -f /swapfile
+        sudo apt clean
+        docker rmi $(docker image ls -aq)
+        df -h
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - uses: cachix/install-nix-action@v10
+      with:
+        install_url: https://hydra.nixos.org/job/nix/flakes/installerScript/latest/download-by-type/file/installer
+        skip_adding_nixpkgs_channel: true
+    - name: Nix config
+      run: |
+        mkdir -p ~/.config/nix
+        echo "experimental-features = flakes nix-command" >> ~/.config/nix/nix.conf
+        sed -i "s@inputs\..*@@g" flake.nix
+        nix registry add nixpkgs github:NixOS/nixpkgs/${{ matrix.nixpkgs }}
+        sed -i 's/ref = "master"/ref = "${{ matrix.tbsync }}"/' flake.nix
+    - name: Nix build
+      run: |
+        nix build -L --recreate-lock-file .#packages.x86_64-linux.${{ matrix.package }}
