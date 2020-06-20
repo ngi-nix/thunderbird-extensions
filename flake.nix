@@ -18,6 +18,9 @@
       # Nixpkgs instantiated for supported system types.
       nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; overlays = [ self.overlay ]; });
 
+      # Generate a user-friendly version numer.
+      version = builtins.substring 0 8 tbsync-src.lastModifiedDate;
+
     in
 
     {
@@ -31,8 +34,7 @@
           overrides = {
             # not really ideal but passes the values to the derivation
             tbsync = callPackage ./pkgs/thunderbird-extensions/tbsync { } {
-              # Generate a user-friendly version numer.
-              version = builtins.substring 0 8 tbsync-src.lastModifiedDate;
+              inherit version;
               src = tbsync-src;
             };
           };
@@ -84,41 +86,69 @@
           sample-thunderbird;
 
         # Additional tests, if applicable.
-        test =
-          with nixpkgsFor.${system};
-          stdenv.mkDerivation {
-            name = "hello-test-${version}";
-
-            buildInputs = [ hello ];
-
-            unpackPhase = "true";
-
-            buildPhase = ''
-              echo 'running some integration tests'
-              [[ $(hello) = 'Hello, world!' ]]
-            '';
-
-            installPhase = "mkdir -p $out";
-          };
-
-        # A VM test of the NixOS module.
-        vmTest =
+        thunderbird-default =
           with import (nixpkgs + "/nixos/lib/testing-python.nix") {
             inherit system;
           };
+          with self.packages.${system};
 
           makeTest {
             nodes = {
-              client = { ... }: {
-                imports = [ self.nixosModules.hello ];
+              machine = { ... }: {
+                environment.systemPackages = [ thunderbird ];
               };
             };
 
             testScript =
               ''
+                import time
+
                 start_all()
-                client.wait_for_unit("multi-user.target")
-                client.succeed("hello")
+
+                machine.execute("mkdir -p ~/fakeprofile")
+                machine.execute("thunderbird --headless --profile ~/fakeprofile &")
+                time.sleep(128)
+
+                if "${tbsync.EMID}" in machine.succeed("ls ~/fakeprofile/extensions"):
+                    raise Exception("Unknown extension in profile")
+
+                if not "1" in machine.succeed("ls ~/fakeprofile/extensions | wc -l"):
+                    raise Exception("Invalid number of extensions")
+
+                machine.shutdown()
+              '';
+          };
+
+        thunderbird-tbsync =
+          with import (nixpkgs + "/nixos/lib/testing-python.nix") {
+            inherit system;
+          };
+          with self.packages.${system};
+
+          makeTest {
+            nodes = {
+              machine = { ... }: {
+                environment.systemPackages = [ sample-thunderbird ];
+              };
+            };
+
+            testScript =
+              ''
+                import time
+
+                start_all()
+
+                machine.execute("mkdir -p ~/fakeprofile")
+                machine.execute("thunderbird --headless --profile ~/fakeprofile &")
+                time.sleep(128)
+
+                if not "${tbsync.EMID}" in machine.succeed("ls ~/fakeprofile/extensions"):
+                    raise Exception("Failed to automatically download extension")
+
+                if not "2" in machine.succeed("ls ~/fakeprofile/extensions | wc -l"):
+                    raise Exception("Invalid number of extensions")
+
+                machine.shutdown()
               '';
           };
       });
