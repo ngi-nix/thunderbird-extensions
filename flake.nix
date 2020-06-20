@@ -25,6 +25,8 @@
       # A Nixpkgs overlay.
       overlay = final: prev: with final.pkgs; {
 
+        thunderbird-with-extensions = callPackage ./pkgs/thunderbird/with-extensions.nix { };
+
         thunderbird-extensions = recurseIntoAttrs (callPackage ./pkgs/thunderbird-extensions {
           overrides = {
             # not really ideal but passes the values to the derivation
@@ -45,15 +47,24 @@
         in
         {
 
+          inherit (pkgSet)
+            thunderbird thunderbird-with-extensions;
+
           inherit (pkgSet.thunderbird-extensions)
             tbsync;
+
+          sample-thunderbird = pkgSet.thunderbird-with-extensions.override {
+            thunderbirdExtensions = with pkgSet.thunderbird-extensions; [
+              tbsync
+            ];
+          };
 
         });
 
       # The default package for 'nix build'. This makes sense if the
       # flake provides only one package or there is a clear "main"
       # package.
-      defaultPackage = forAllSystems (system: self.packages.${system}.hello);
+      defaultPackage = forAllSystems (system: self.packages.${system}.thunderbird-with-extensions);
 
       # A NixOS module, if applicable (e.g. if the package provides a system service).
       nixosModules.hello =
@@ -68,6 +79,9 @@
 
       # Tests run by 'nix flake check' and by Hydra.
       checks = forAllSystems (system: {
+        inherit (self.packages.${system})
+          thunderbird thunderbird-with-extensions;
+
         inherit (self.packages.${system}.thunderbird-extensions)
           tbsync;
 
