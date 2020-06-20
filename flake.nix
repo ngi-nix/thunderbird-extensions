@@ -5,7 +5,7 @@
   inputs.nixpkgs = { type = "github"; owner = "NixOS"; repo = "nixpkgs"; ref = "nixos-20.03"; };
 
   # Upstream source tree(s).
-  inputs.tbsync-src = { type = "github"; owner = "jobisoft"; repo = "TbSync"; flake = false; };
+  inputs.tbsync-src = { type = "github"; owner = "jobisoft"; repo = "TbSync"; ref = "master"; flake = false; };
 
   outputs = { self, nixpkgs, tbsync-src, ... }@inputs:
     let
