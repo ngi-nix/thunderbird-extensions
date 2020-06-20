@@ -118,7 +118,7 @@
                 machine.execute("thunderbird --headless --profile ~/fakeprofile &")
                 time.sleep(128)
 
-                if "${tbsync.EMID}" in machine.succeed("ls ~/fakeprofile/extensions"):
+                if "${tbsync.emid}" in machine.succeed("ls ~/fakeprofile/extensions"):
                     raise Exception("Unknown extension in profile")
 
                 if not "1" in machine.succeed("ls ~/fakeprofile/extensions | wc -l"):
@@ -155,7 +155,7 @@
                 machine.execute("thunderbird --headless --profile ~/fakeprofile &")
                 time.sleep(128)
 
-                if not "${tbsync.EMID}" in machine.succeed("ls ~/fakeprofile/extensions"):
+                if not "${tbsync.emid}" in machine.succeed("ls ~/fakeprofile/extensions"):
                     raise Exception("Failed to automatically download extension")
 
                 if not "2" in machine.succeed("ls ~/fakeprofile/extensions | wc -l"):
