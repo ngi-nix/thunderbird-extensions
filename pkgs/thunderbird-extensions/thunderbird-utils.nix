@@ -17,9 +17,9 @@ let
     };
 in {
   buildThunderbirdExtension =
-    { pname, version, src
+    { pname, version, src, buildPhase ? ""
     , nativeBuildInputs ? []
-    , emid, extensionDir ? defaultExtensionDir, topLevelPaths, ... }@args:
+    , emid, extensionDir ? defaultExtensionDir, topLevelPaths ? [], ... }@args:
     stdenv.mkDerivation ((removeAttrs args [ "emid" "extensionDir" "topLevelPaths" ]) // {
       inherit emid extensionDir;
 
@@ -27,7 +27,9 @@ in {
 
       buildPhase = ''
         runHook preBuild
-        zip -rT $emid.xpi ${lib.concatStringsSep " " topLevelPaths}
+        ${if (buildPhase != "")
+          then buildPhase
+          else "zip -rT $emid.xpi ${lib.concatStringsSep " " topLevelPaths}"}
         runHook postBuild
       '';
 
