@@ -26,6 +26,7 @@ jobs:
           - tbsync
           - dav-4-tbsync
           - eas-4-tbsync
+          - autocrypt
           - sample-thunderbird
 
     steps:

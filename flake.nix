@@ -6,8 +6,9 @@
 
   # Upstream source tree(s).
   inputs.tbsync-src = { type = "github"; owner = "jobisoft"; repo = "TbSync"; ref = "master"; flake = false; };
+  inputs.autocrypt-src = { type = "github"; owner = "autocrypt-thunderbird"; repo = "autocrypt-thunderbird"; ref = "master"; flake = false; };
 
-  outputs = { self, nixpkgs, tbsync-src, ... }@inputs:
+  outputs = { self, nixpkgs, tbsync-src, autocrypt-src, ... }@inputs:
     let
       # System types to support.
       supportedSystems = [ "x86_64-linux" ];
@@ -19,7 +20,9 @@
       nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; overlays = [ self.overlay ]; });
 
       # Generate a user-friendly version numer.
-      version = builtins.substring 0 8 tbsync-src.lastModifiedDate;
+      tbsync-version = builtins.substring 0 8 tbsync-src.lastModifiedDate;
+      autocrypt-version = builtins.substring 0 8 autocrypt-src.lastModifiedDate;
+      version = tbsync-version;
 
     in
 
@@ -36,8 +39,13 @@
           overrides = {
             # not really ideal but passes the values to the derivation
             tbsync = callPackage ./pkgs/thunderbird-extensions/tbsync { } {
-              inherit version;
+              version = tbsync-version;
               src = tbsync-src;
+            };
+
+            autocrypt = callPackage ./pkgs/thunderbird-extensions/autocrypt { } {
+              version = autocrypt-version;
+              src = autocrypt-src;
             };
           };
         });
@@ -56,7 +64,8 @@
 
           inherit (pkgSet.thunderbird-extensions)
             enigmail
-            tbsync dav-4-tbsync eas-4-tbsync;
+            tbsync dav-4-tbsync eas-4-tbsync
+            autocrypt;
 
           sample-thunderbird = pkgSet.thunderbird-with-extensions.override {
             thunderbirdExtensions = with pkgSet.thunderbird-extensions; [
