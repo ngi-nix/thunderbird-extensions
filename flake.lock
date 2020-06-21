@@ -1,5 +1,24 @@
 {
   "nodes": {
+    "autocrypt-src": {
+      "flake": false,
+      "info": {
+        "lastModified": 1567414975,
+        "narHash": "sha256-4vD/poM6CCYpOjP2jNcI38lZYTNn0dItvlzIpw0mptE="
+      },
+      "locked": {
+        "owner": "autocrypt-thunderbird",
+        "repo": "autocrypt-thunderbird",
+        "rev": "3953dda07ad8b0d99beab1c9e61da147bcaf3ff5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "autocrypt-thunderbird",
+        "ref": "master",
+        "repo": "autocrypt-thunderbird",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "info": {
         "lastModified": 1592495204,
@@ -20,6 +39,7 @@
     },
     "root": {
       "inputs": {
+        "autocrypt-src": "autocrypt-src",
         "nixpkgs": "nixpkgs",
         "tbsync-src": "tbsync-src"
       }
