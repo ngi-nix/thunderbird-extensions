@@ -33,7 +33,7 @@ in {
 
       installPhase = ''
         runHook preInstall
-        mkdir -p $out/$extensionDir/$emid
+        mkdir -p $out/$extensionDir
         cp $emid.xpi $out/$extensionDir
         runHook postInstall
       '';
