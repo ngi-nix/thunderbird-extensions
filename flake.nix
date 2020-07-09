@@ -105,73 +105,47 @@
 
         # Additional tests, if applicable.
         thunderbird-default =
-          with import (nixpkgs + "/nixos/lib/testing-python.nix") {
-            inherit system;
-          };
+          with nixpkgsFor.${system};
           with self.packages.${system};
-
-          makeTest {
-            nodes = {
-              machine = { ... }: {
-                environment.systemPackages = [ thunderbird ];
-              };
-            };
-
-            testScript =
-              ''
-                import time
-
-                start_all()
-
-                machine.execute("mkdir -p ~/fakeprofile")
-                machine.execute("thunderbird --headless --profile ~/fakeprofile &")
-                time.sleep(128)
-
-                if "${tbsync.emid}" in machine.succeed("ls ~/fakeprofile/extensions"):
-                    raise Exception("Unknown extension in profile")
-
-                if not "1" in machine.succeed("ls ~/fakeprofile/extensions | wc -l"):
-                    raise Exception("Invalid number of extensions")
-
-                machine.shutdown()
-              '';
+          stdenv.mkDerivation {
+            name = "thunderbird-default-test";
+            unpackPhase = ":";
+            buildInputs = [ thunderbird ];
+            buildPhase = ''
+              export HOME=$(pwd)
+              mkdir -p $HOME/fakeprofile
+              thunderbird --headless --profile $HOME/fakeprofile &
+              sleep 128
+              ls $HOME/fakeprofile/extensions | grep -q ${tbsync.emid} && exit 1 || echo "valid extensions"
+              [ "$(ls $HOME/fakeprofile/extensions | wc -l)" = "1" ] && echo "valid number of extensions" || exit 1
+            '';
+            installPhase = ''
+              mkdir -p $out
+            '';
           };
 
         thunderbird-tbsync =
-          with import (nixpkgs + "/nixos/lib/testing-python.nix") {
-            inherit system;
-          };
+          with nixpkgsFor.${system};
           with self.packages.${system};
-
-          makeTest {
-            nodes = {
-              machine = { ... }: {
-                imports = [ self.nixosModules.thunderbird ];
-                services.thunderbird = {
-                  enable = true;
-                  extensions = [ tbsync ];
-                };
-              };
-            };
-
-            testScript =
-              ''
-                import time
-
-                start_all()
-
-                machine.execute("mkdir -p ~/fakeprofile")
-                machine.execute("thunderbird --headless --profile ~/fakeprofile &")
-                time.sleep(128)
-
-                if not "${tbsync.emid}" in machine.succeed("ls ~/fakeprofile/extensions"):
-                    raise Exception("Failed to automatically download extension")
-
-                if not "2" in machine.succeed("ls ~/fakeprofile/extensions | wc -l"):
-                    raise Exception("Invalid number of extensions")
-
-                machine.shutdown()
-              '';
+          stdenv.mkDerivation {
+            name = "thunderbird-tbsync-test";
+            unpackPhase = ":";
+            buildInputs = [
+              (thunderbird-with-extensions.override {
+                thunderbirdExtensions = [ thunderbird-extensions.tbsync ];
+              })
+            ];
+            buildPhase = ''
+              export HOME=$(pwd)
+              mkdir -p $HOME/fakeprofile
+              thunderbird --headless --profile $HOME/fakeprofile &
+              sleep 128
+              ls $HOME/fakeprofile/extensions | grep -q ${tbsync.emid} && echo "found tbsync" || exit 1
+              [ "$(ls $HOME/fakeprofile/extensions | wc -l)" = "2" ] && echo "valid number of extensions" || exit 1
+            '';
+            installPhase = ''
+              mkdir -p $out
+            '';
           };
       });
 
