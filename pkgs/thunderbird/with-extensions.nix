@@ -25,7 +25,7 @@ in runCommand "thunderbird-with-extensions-${thunderbird.version}" {
   dontStrip = true;
   dontPatchELF = true;
   meta = thunderbird.meta // {
-    platforms = lib.platforms.linux;
+    platforms = lib.platforms.all;
   };
 
   nativeBuildInputs = [ zip unzip ];
