@@ -1,7 +1,11 @@
-{ stdenv, lib
-, zip, unzip, thunderbird
-, fetchurl, runCommand }:
-
+{ stdenv
+, lib
+, zip
+, unzip
+, thunderbird
+, fetchurl
+, runCommand
+}:
 let
   # There's no specific reason for having one, but it seems like if there were a global installation
   # directory, this would be it
@@ -15,11 +19,19 @@ let
       url = "https://addons.thunderbird.net/user-media/addons/_attachments/${id}/${addon}-${version}-tb.xpi";
       inherit sha256;
     };
-in {
+in
+{
   buildThunderbirdExtension =
-    { pname, version, src, buildPhase ? ""
-    , nativeBuildInputs ? []
-    , emid, extensionDir ? defaultExtensionDir, topLevelPaths ? [], ... }@args:
+    { pname
+    , version
+    , src
+    , buildPhase ? ""
+    , nativeBuildInputs ? [ ]
+    , emid
+    , extensionDir ? defaultExtensionDir
+    , topLevelPaths ? [ ]
+    , ...
+    }@args:
     stdenv.mkDerivation ((removeAttrs args [ "emid" "extensionDir" "topLevelPaths" ]) // {
       inherit emid extensionDir;
 
@@ -42,16 +54,25 @@ in {
     });
 
   buildMozillaExtension =
-    { pname, version, postBuild ? ""
+    { pname
+    , version
+    , postBuild ? ""
     , emid
-    , id ? "", addon ? pname, sha256 ? lib.fakeSha256
-    , xpi ? null, extensionDir ? defaultExtensionDir, ... }@args:
-    runCommand "${pname}-${version}" {
-      inherit emid extensionDir;
-      src = if xpi != null
-        then xpi
-        else fetchMozillaAddon { inherit id addon version sha256; };
-    } ''
+    , id ? ""
+    , addon ? pname
+    , sha256 ? lib.fakeSha256
+    , xpi ? null
+    , extensionDir ? defaultExtensionDir
+    , ...
+    }@args:
+    runCommand "${pname}-${version}"
+      {
+        inherit emid extensionDir;
+        src =
+          if xpi != null
+          then xpi
+          else fetchMozillaAddon { inherit id addon version sha256; };
+      } ''
       mkdir -p $out/$extensionDir
       cp $src $out/$extensionDir/$emid.xpi
       ${postBuild}

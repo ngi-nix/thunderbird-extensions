@@ -1,8 +1,12 @@
-{ lib, writeText, runCommand, thunderbird
-, zip, unzip
-, thunderbirdExtensions ? []
-, policyConfig ? {} }:
-
+{ lib
+, writeText
+, runCommand
+, thunderbird
+, zip
+, unzip
+, thunderbirdExtensions ? [ ]
+, policyConfig ? { }
+}:
 let
   distributionDir = "lib/thunderbird/distribution";
   policyFilename = "policies.json";
@@ -16,12 +20,15 @@ let
     };
   });
 
-  defaultPolicy = if builtins.pathExists "${thunderbird}/${distributionDir}/${policyFilename}"
+  defaultPolicy =
+    if builtins.pathExists "${thunderbird}/${distributionDir}/${policyFilename}"
     then builtins.fromJSON (builtins.readFile "${thunderbird}/${distributionDir}/${policyFilename}")
-    else {};
+    else { };
 
   policy = with lib; recursiveUpdate (recursiveUpdate defaultPolicy extensionPolicy) policyConfig;
-in runCommand "thunderbird-with-extensions-${thunderbird.version}" {
+in
+runCommand "thunderbird-with-extensions-${thunderbird.version}"
+{
   dontStrip = true;
   dontPatchELF = true;
   meta = thunderbird.meta // {

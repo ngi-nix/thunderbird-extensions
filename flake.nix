@@ -25,7 +25,6 @@
       version = tbsync-version;
 
     in
-
     {
 
       # A Nixpkgs overlay.

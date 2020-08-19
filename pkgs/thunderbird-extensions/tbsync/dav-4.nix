@@ -15,7 +15,13 @@ thunderbird-utils.buildThunderbirdExtension rec {
   # This should be a copy and paste of the paths in the zip command here
   # https://github.com/jobisoft/DAV-4-TbSync/blob/master/Makefile.bat#L9
   topLevelPaths = [
-    "content" "_locales" "skin" "chrome.manifest" "manifest.json" "bootstrap.js" "LICENSE"
+    "content"
+    "_locales"
+    "skin"
+    "chrome.manifest"
+    "manifest.json"
+    "bootstrap.js"
+    "LICENSE"
     "CONTRIBUTORS.md"
   ];
 }

@@ -10,7 +10,14 @@ thunderbird-utils.buildThunderbirdExtension {
   # https://github.com/jobisoft/TbSync/blob/master/Makefile.bat#L9
   topLevelPaths =
     [
-      "content" "_locales" "skin" "chrome.manifest" "manifest.json" "LICENSE" "README.md"
-      "bootstrap.js" "CONTRIBUTORS.md"
+      "content"
+      "_locales"
+      "skin"
+      "chrome.manifest"
+      "manifest.json"
+      "LICENSE"
+      "README.md"
+      "bootstrap.js"
+      "CONTRIBUTORS.md"
     ];
 }

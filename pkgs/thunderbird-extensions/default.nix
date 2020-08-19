@@ -1,4 +1,4 @@
-{ callPackage, thunderbird-utils, overrides ? {}, ... }:
+{ callPackage, thunderbird-utils, overrides ? { }, ... }:
 
 {
   enigmail = thunderbird-utils.buildMozillaExtension {
