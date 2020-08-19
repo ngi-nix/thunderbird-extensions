@@ -10,10 +10,13 @@ A basic overview of the what should be reviewed.
 - An initial setup is not needed, feel free to just press cancel and move on
 - Click the calendar icon on the top right and verify that it should be empty (as it should by default)
 - Click the hamburger icon next on the menubar near the `Tasks` section and click through `Add-ons` > `TbSync`
+  - Can also be reached through `Edit` > `Synchronization Settings (TbSync)`
 - With the new window click `Account actions` > `Add new account` > `CalDAV & CardDAV`
 - With the new window click `Google` > `Next` > `Next` and login to the Gmail account and allowing TbSync access to the account for the permissions requested before clicking `Finish`
 - Check `Enable and Synchronize this account` and wait for the `Status` and `Avaiable resources` sections to pop up and populate
 - Check the checkbox next to the calendar icon(s) before clicking `Synchronize now` on the bottom right
+  - If there are no events or dates in your calendar, the icon may be missing
+  - In which case, if you have contacts (address book), you can synchronize them instead
 - Exit the TbSync settings tab back to the main window and switch to the `Calendar` tab where a "Calendar" should have popped up with the name `Google (your_email_here@gmail.com)` or `Google ...` if there were multiple calendars
 - If there were any events in your calendar at Gmail, it should also pop up
 
